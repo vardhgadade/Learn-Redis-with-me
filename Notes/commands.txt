@@ -1,0 +1,535 @@
+# ============================================================
+# REDIS LISTS - NOTES
+# ============================================================
+#
+# Redis List:
+# A List is an ordered collection of strings.
+#
+# Example:
+#
+# coin -> [3, 2, 1, 0]
+#
+# Think of a Redis List like a Python list / queue.
+#
+# ============================================================
+
+
+# ============================================================
+# 1. LPUSH
+# ============================================================
+#
+# LPUSH = Left Push
+#
+# Adds one or more values to the LEFT side of a Redis List.
+#
+# If the key does not exist, Redis automatically creates the List.
+#
+# Syntax:
+#
+# LPUSH <key> <value>
+#
+# Example:
+#
+LPUSH coin 1
+#
+# Result:
+#
+# coin -> [1]
+#
+# Add another value:
+#
+LPUSH coin 2
+#
+# Result:
+#
+# coin -> [2, 1]
+#
+# Add another:
+#
+LPUSH coin 3
+#
+# Result:
+#
+# coin -> [3, 2, 1]
+#
+# IMPORTANT:
+# LPUSH always adds the new value to the LEFT/start.
+#
+# ============================================================
+
+
+# ============================================================
+# 2. RPUSH
+# ============================================================
+#
+# RPUSH = Right Push
+#
+# Adds one or more values to the RIGHT side of a Redis List.
+#
+# Syntax:
+#
+# RPUSH <key> <value>
+#
+# Example:
+#
+RPUSH coin 0
+#
+# Before:
+#
+# coin -> [3, 2, 1]
+#
+# After:
+#
+# coin -> [3, 2, 1, 0]
+#
+# IMPORTANT:
+# RPUSH always adds the new value to the RIGHT/end.
+#
+# ============================================================
+
+
+# ============================================================
+# 3. LPOP
+# ============================================================
+#
+# LPOP = Left Pop
+#
+# Removes and returns the FIRST element from the LEFT side.
+#
+# Syntax:
+#
+# LPOP <key>
+#
+# Example:
+#
+LPOP coin
+#
+# If:
+#
+# coin -> [3, 2, 1, 0]
+#
+# Result:
+#
+# "3"
+#
+# List becomes:
+#
+# coin -> [2, 1, 0]
+#
+# IMPORTANT:
+# LPOP = remove from LEFT
+#
+# ============================================================
+
+
+# ============================================================
+# 4. RPOP
+# ============================================================
+#
+# RPOP = Right Pop
+#
+# Removes and returns the LAST element from the RIGHT side.
+#
+# Syntax:
+#
+# RPOP <key>
+#
+# Example:
+#
+RPOP coin
+#
+# If:
+#
+# coin -> [3, 2, 1, 0]
+#
+# Result:
+#
+# "0"
+#
+# List becomes:
+#
+# coin -> [3, 2, 1]
+#
+# IMPORTANT:
+# RPOP = remove from RIGHT
+#
+# ============================================================
+
+
+# ============================================================
+# 5. LLEN
+# ============================================================
+#
+# LLEN = List Length
+#
+# Returns the number of elements inside a Redis List.
+#
+# Syntax:
+#
+# LLEN <key>
+#
+# Example:
+#
+LLEN coin
+#
+# If:
+#
+# coin -> [3, 2, 1]
+#
+# Result:
+#
+# (integer) 3
+#
+# IMPORTANT:
+# LLEN does NOT modify the List.
+# It only tells us how many elements are present.
+#
+# ============================================================
+
+
+# ============================================================
+# 6. BLPOP
+# ============================================================
+#
+# BLPOP = Blocking Left Pop
+#
+# Removes and returns an element from the LEFT side.
+#
+# The important difference from LPOP:
+#
+# LPOP:
+#   If the List is empty -> immediately returns nil
+#
+# BLPOP:
+#   If the List is empty -> WAITS for an element
+#
+# Syntax:
+#
+# BLPOP <key> <timeout>
+#
+# timeout is in SECONDS.
+#
+# Example:
+#
+BLPOP coin 10
+#
+# Meaning:
+#
+# "Remove an element from the left of coin.
+# If coin is empty, wait for up to 10 seconds."
+#
+# If:
+#
+# coin -> [3, 2, 1, 0]
+#
+# Result:
+#
+# 1) "coin"
+# 2) "3"
+#
+# List becomes:
+#
+# coin -> [2, 1, 0]
+#
+# If the List is empty:
+#
+BLPOP coin 10
+#
+# Redis waits approximately 10 seconds.
+#
+# If nothing is added during that time:
+#
+# (nil)
+#
+# ============================================================
+# REAL-WORLD USE:
+# ============================================================
+#
+# BLPOP is commonly useful for implementing a simple QUEUE.
+#
+# Producer:
+#
+RPUSH jobs "job-1"
+RPUSH jobs "job-2"
+RPUSH jobs "job-3"
+#
+# Redis:
+#
+# jobs -> [job-1, job-2, job-3]
+#
+# Worker:
+#
+BLPOP jobs 0
+#
+# Worker receives:
+#
+# job-1
+#
+# The 0 timeout means:
+# "Wait indefinitely until an item becomes available."
+#
+# ============================================================
+
+
+# ============================================================
+# 7. BRPOP
+# ============================================================
+#
+# BRPOP = Blocking Right Pop
+#
+# Same idea as BLPOP, but removes from the RIGHT side.
+#
+# Syntax:
+#
+# BRPOP <key> <timeout>
+#
+# Example:
+#
+BRPOP jobs 10
+#
+# If:
+#
+# jobs -> [job-1, job-2, job-3]
+#
+# Result:
+#
+# 1) "jobs"
+# 2) "job-3"
+#
+# List becomes:
+#
+# jobs -> [job-1, job-2]
+#
+# ============================================================
+
+
+# ============================================================
+# 8. ACL
+# ============================================================
+#
+# ACL = Access Control List
+#
+# ACL is NOT related to Redis Lists.
+#
+# ACL is used to manage:
+#
+# - Redis users
+# - Passwords
+# - Permissions
+# - Which commands a user can execute
+#
+# Example:
+#
+ACL LIST
+#
+# Shows the configured Redis users.
+#
+# Example:
+#
+ACL WHOAMI
+#
+# Shows the currently authenticated Redis user.
+#
+# IMPORTANT:
+#
+# Typing only:
+#
+ACL
+#
+# is incomplete, so Redis returns:
+#
+# ERR wrong number of arguments for 'acl' command
+#
+# ============================================================
+
+
+# ============================================================
+# 9. LLEN WITH A NON-EXISTING KEY
+# ============================================================
+#
+# Example:
+#
+LLEN voin
+#
+# If "voin" does not exist:
+#
+# (integer) 0
+#
+# Redis returns 0 because the List does not exist
+# and therefore contains zero elements.
+#
+# NOTE:
+#
+# "voin" and "coin" are completely different keys.
+#
+# coin -> existing List
+# voin -> different/non-existing key
+#
+# ============================================================
+
+
+# ============================================================
+# 10. COMMON ERROR - LLEM
+# ============================================================
+#
+# If you type:
+#
+LLEM
+#
+# Redis returns:
+#
+# ERR unknown command 'llem'
+#
+# because LLEM is NOT a Redis command.
+#
+# Probably you meant:
+#
+LLEN coin
+#
+# ============================================================
+
+
+# ============================================================
+# 11. COMMON ERROR - RPUSH
+# ============================================================
+#
+# WRONG:
+#
+RPUSH 0
+#
+# Redis returns:
+#
+# ERR wrong number of arguments for 'rpush' command
+#
+# Why?
+#
+# RPUSH needs:
+#
+# RPUSH <key> <value>
+#
+# Correct:
+#
+RPUSH coin 0
+#
+# ============================================================
+
+
+# ============================================================
+# 12. QUICK MEMORY TRICK
+# ============================================================
+#
+# PUSH = ADD
+# POP  = REMOVE
+#
+# L = LEFT
+# R = RIGHT
+# B = BLOCKING
+#
+# Therefore:
+#
+# LPUSH  -> ADD to LEFT
+# RPUSH  -> ADD to RIGHT
+#
+# LPOP   -> REMOVE from LEFT
+# RPOP   -> REMOVE from RIGHT
+#
+# BLPOP  -> WAIT + REMOVE from LEFT
+# BRPOP  -> WAIT + REMOVE from RIGHT
+#
+# LLEN   -> COUNT elements
+#
+# ============================================================
+
+
+# ============================================================
+# 13. VISUAL UNDERSTANDING
+# ============================================================
+#
+#                 REDIS LIST
+#                key = "coin"
+#
+#       LEFT                         RIGHT
+#        |                             |
+#        v                             v
+#
+#      [ 3 ] [ 2 ] [ 1 ] [ 0 ]
+#        ^                             ^
+#        |                             |
+#      LPUSH                         RPUSH
+#
+#
+# LPOP
+#   |
+#   v
+# [ 3 ] [ 2 ] [ 1 ] [ 0 ]
+#   X
+#
+# Removes 3.
+#
+#
+# RPOP
+#                         |
+#                         v
+# [ 3 ] [ 2 ] [ 1 ] [ 0 ]
+#                         X
+#
+# Removes 0.
+#
+# ============================================================
+
+
+# ============================================================
+# 14. IMPORTANT REDIS CONCEPT
+# ============================================================
+#
+# "coin" is NOT a Redis List itself.
+#
+# "coin" is a KEY.
+#
+# The VALUE stored against that key is a List.
+#
+# Example:
+#
+# coin -> [3, 2, 1, 0]
+#
+# Redis Key:
+#     coin
+#
+# Redis Data Type:
+#     List
+#
+# Redis Values:
+#     3
+#     2
+#     1
+#     0
+#
+# ============================================================
+
+
+# ============================================================
+# 15. LIST COMMAND CHEAT SHEET
+# ============================================================
+#
+# LPUSH key value
+#     Add value to LEFT
+#
+# RPUSH key value
+#     Add value to RIGHT
+#
+# LPOP key
+#     Remove from LEFT
+#
+# RPOP key
+#     Remove from RIGHT
+#
+# LLEN key
+#     Get number of elements
+#
+# BLPOP key timeout
+#     Wait and remove from LEFT
+#
+# BRPOP key timeout
+#     Wait and remove from RIGHT
+#
+# ============================================================
