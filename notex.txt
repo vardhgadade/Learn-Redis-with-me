@@ -1,0 +1,26 @@
+what is redis:-(Remote dictonary server)
+          It is an in-memory data structure used as database,cache.message broker and strearming.
+          REDIS staors the data in RAM so reading and writing data is extremely fast
+          it is also called as cache tool
+          it stores the data in key value pair         0 
+
+#Database(like sql or pgsql):- They store data in the disk of the system but redis stores the data in RAM6
+
+By default the redis server is running on pott 6379 run 
+
+redis is work in CLI
+
+what is redis stack?
+->IT is THe UI OF Redis for better understanding of the Devs
+
+Commands:-
+i)Set:- It is used to set the value in redis 
+ii)Get:- It is used to get the value from the redis
+iii)nx:- It is used to store the value only if that key never ecists in redis
+iii)mgen:- It is used to multiple get at once
+iv)mset:- It is used to set multiple values at once
+v)incr:- to increment in value
+vi)incrby:- to incremenet by x number 
+
+#when youre keeping any string in redis the maximum length can be 512 mb
+

@@ -11,3 +11,9 @@ class UserRead(BaseModel):
     name: str
     email: EmailStr
 
+class RedisValue(BaseModel):
+    value:str
+
+class ListValue(BaseModel):
+    value:str
+
