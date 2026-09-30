@@ -104,4 +104,5 @@ def get_list(key:str,request:Request):
         "values":Cleint.lrange(key,0,-1)
     }
 
-    
+
+
